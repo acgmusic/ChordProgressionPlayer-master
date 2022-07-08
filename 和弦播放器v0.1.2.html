@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> 和弦播放器 </title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        @font-face {
+            font-family: 'Opus';
+            src: url('./font/OpusChordsSansStd.otf');
+        }
+
+        :root {
+            --pub_height: 30px;
+            --pub_basic_width: 12px;
+            --chord_bar_height: 35px;
+            --ronum_bar_height: 25px;
+            --c_mod_bar_height: 20px;
+        }
+        .main-area{
+            margin-top: 3px;
+        }
+        #left-top-btn{
+            position: fixed;
+        }
+
+        .menu {
+            /*width: 15px;*/
+            height: 15px;
+            line-height: 15px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            border: 1px black solid;
+            border-radius: 2px;
+        }
+
+        .detail-menu{
+            font-size: 25px;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 4px rgba(40,40,40, 0.4) solid;
+            padding: 3px;
+        }
+
+        #left-top, #left-top-mirror{
+            width: 70px;
+            height: var(--pub_height);
+            background-color: rgb(102, 255, 255);
+            border: 1px rgb(40,40,40) solid;
+        }
+
+
+        #top-bar-scale, #top-bar-scale-mirror{
+            width: 30px;
+            height: var(--pub_height);
+            line-height: var(--pub_height);
+            border: 1px rgb(40,40,40) solid;
+            border-left: 3px black solid;
+            border-right: 3px black solid;
+            text-align: center;
+        }
+        .flex{
+            display: flex;
+            justify-content: center;
+            top: 0;
+            margin-top: 0;
+        }
+        .fixed{
+            display: flex;
+            position: fixed;
+            top: 3px;
+            left: 0;
+            right: 0;
+            margin-left:auto;
+            margin-right:auto;
+            justify-content: center;
+        }
+
+        .top-bar-num{
+            width: calc(var(--pub_basic_width) * 4 - 5px);
+            height: var(--pub_height);
+            line-height: var(--pub_height);
+            background-color: rgb(46, 225, 225);
+            border: 1px rgb(40,40,40) solid;
+            text-align: left;
+            font-weight: bold;
+            font-size: 20px;
+            padding-left: 3px;
+        }
+        .page-changer-btn{
+            /*width: 20px;*/
+            /*height: 20px;*/
+        }
+        .top-bar-remark{
+            width: 200px;
+            height: var(--pub_height);
+            border: 1px black solid;
+            background-color: black;
+        }
+        .lighter-color{
+            background-color: rgb(102, 275, 275);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            width: 50px;
+            font-size: 18px;
+            text-align: center;
+            height: var(--pub_height);
+            line-height: var(--pub_height);
+            border: 1px black solid;
+        }
+
+        .play-icon,
+        .stop-icon {
+
+        }
+
+        .menu:hover,
+        .play-icon:hover,
+        .stop-icon:hover,
+        .page-changer-btn:hover,
+        .custom-file-upload:hover{
+            cursor: pointer;
+        }
+
+        .div-chord-prog-line{
+            display: flex;
+            justify-content: center;
+        }
+        .block-name{
+
+        }
+        .scale-name{
+
+        }
+        .block-name-top,
+        .block-name-mid,
+        .block-name-btm{
+            width: 68px;
+            padding-left: 2px;
+            line-height: var(--chord_bar_height);
+            background-color: rgb(102, 255, 255);
+            border: 1px rgb(102, 255, 255) solid;
+            border-left: 1px rgb(155, 155, 155) solid;
+            border-right: 1px rgb(155, 155, 155) solid;
+            text-align: left;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .block-name-top{
+            height: var(--chord_bar_height);
+        }
+        .block-name-mid{
+            height: var(--ronum_bar_height);
+        }
+        .block-name-btm{
+            height: var(--c_mod_bar_height);
+        }
+        .scale-name-top,
+        .scale-name-mid,
+        .scale-name-btm{
+            width: 30px;
+            border: 1px black solid;
+            border-left: 3px black solid;
+            border-right: 3px black solid;
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: 'Opus';
+        }
+        .scale-name-top{
+            height: var(--chord_bar_height);
+            line-height: var(--chord_bar_height);
+        }
+        .scale-name-mid{
+            height: var(--ronum_bar_height);
+            line-height: var(--ronum_bar_height);
+        }
+        .scale-name-btm{
+            height: var(--c_mod_bar_height);
+            line-height: var(--c_mod_bar_height);
+        }
+
+        .chord-name{
+
+        }
+        /*和弦快鼠标悬停*/
+        /*.chord-name:hover{*/
+        /*    cursor: pointer;*/
+        /*    !*border: 3px black solid;*!*/
+        /*}*/
+
+        .chord-name-top,
+        .roman-num-name-mid,
+        .c-mod-name-btm{
+            border: 1px rgba(40,40,40,0.2) solid;
+            text-align: left;
+            padding-left: 3px;
+            font-family: 'Opus';
+        }
+        .chord-name-top{
+            height: var(--chord_bar_height);
+            line-height: var(--chord_bar_height);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+
+        .roman-num-name-mid{
+            height: var(--ronum_bar_height);
+            line-height: var(--ronum_bar_height);
+            font-size: 16px;
+        }
+        .c-mod-name-btm{
+            height: var(--c_mod_bar_height);
+            line-height: var(--c_mod_bar_height);
+            font-size: 12px;
+        }
+
+        /*解说栏*/
+        .right-bar-remark{
+            width: 200px;
+            font-size: 13px;
+            height: calc(var(--chord_bar_height) + var(--ronum_bar_height) + var(--c_mod_bar_height) + 4px);
+            border: 1px black solid;
+            background-color: black;
+            color: white;
+            font-family: 'Opus';
+        }
+
+        /*延迟输入*/
+        #delay-range-input{
+            width: 70px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="left-top-btn">
+        <div class="menu" onclick="show_menu();">▲</div>
+        <div style="height: 5px"></div>
+        <div class="detail-menu">
+            <label class="custom-file-upload">
+                <input type="file" id="file-uploader"/>
+                导入
+            </label>
+            <div style="height: 20px"></div>
+            <div style="display: flex;">
+                <div class="play-icon" onclick="play();"> ▶️ </div>
+                <div class="stop-icon" onclick="stop();"> ⏹ </div>
+            </div>
+
+            <div style="height: 30px"></div>
+
+
+            <div style="height: 20px; font-size: 15px;"> 翻页 </div>
+
+            <div style="display: flex;">
+                <div onclick="load_prev_page();" class="page-changer-btn"> ⏪ </div>
+                <div onclick="load_next_page();" class="page-changer-btn"> ⏩ </div>
+            </div>
+
+            <div style="height: 20px"></div>
+
+            <div style="height: 15px; font-size: 15px;"> 倍速播放 </div>
+
+            <div>
+                <select name="rate" onchange="change_audio_speed();" id="play-back-rate-select">
+                    <option value=0.5> 0.5 </option>
+                    <option value=0.75> 0.75 </option>
+                    <option value=1 selected="selected"> 1 </option>
+                    <option value=1.25> 1.25 </option>
+                    <option value=1.5> 1.5 </option>
+                    <option value=1.75> 1.75 </option>
+                    <option value=2> 2 </option>
+                </select>
+            </div>
+
+            <div style="height: 20px"></div>
+
+            <div style="height: 15px; font-size: 15px;"> 延迟调整 </div>
+
+            <div>
+                <input id="delay-range-input" type="range" name="points" min="-100" max="100">
+            </div>
+
+            <div style="height: 20px"></div>
+
+            <button id="close-rmk-btn" onclick="close_rmk();">关闭注释</button>
+
+        </div>
+    </div>
+
+
+    <div class="main-area">
+        <div id="top-bar" class="flex">
+            <div id="left-top">
+            </div>
+            <div id="top-bar-scale">调</div>
+            <div class="top-bar-num">1</div>
+            <div class="top-bar-num">1</div>
+            <div class="top-bar-num">1</div>
+            <div class="top-bar-num">1</div>
+            <div class="top-bar-num lighter-color">2</div>
+            <div class="top-bar-num lighter-color">2</div>
+            <div class="top-bar-num lighter-color">2</div>
+            <div class="top-bar-num lighter-color">2</div>
+            <div class="top-bar-num">3</div>
+            <div class="top-bar-num">3</div>
+            <div class="top-bar-num">3</div>
+            <div class="top-bar-num">3</div>
+            <div class="top-bar-num lighter-color">4</div>
+            <div class="top-bar-num lighter-color">4</div>
+            <div class="top-bar-num lighter-color">4</div>
+            <div class="top-bar-num lighter-color">4</div>
+            <div class="top-bar-remark"></div>
+        </div>
+    </div>
+
+
+
+    <script>
+        /*当前页码*/
+        window.cur_page = 0;
+        window.max_page = undefined;
+        /*当前歌曲名称(无后缀)*/
+        window.cur_song_fp = undefined;
+        window.audio = undefined;
+        /*鼠标当前所在div的颜色*/
+        window.cur_div_color = undefined;
+        /*播放状态*/
+        window.is_playing = false;
+        /*当前播放所在和弦块的位置*/
+        window.cur_chord_bar_id = 0;   /*由音乐时间决定*/
+        /*当前高亮所在和弦块的位置*/
+        window.cur_highlight_bar_id = -1;
+        window.chord_prog_page_arr = undefined;
+        /*是否显示注释*/
+        window.show_rmk = true;
+        /*在音乐播放时，记录滚动条当前位置*/
+        window.cur_scrollTop = undefined;
+
+
+        /*css信息*/
+        let pub_height = get_css_root_val("--pub_height");
+        let pub_basic_width = get_css_root_val("--pub_basic_width");
+        let chord_bar_height = get_css_root_val("--chord_bar_height");
+        let ronum_bar_height = get_css_root_val("--ronum_bar_height");
+        let c_mod_bar_height = get_css_root_val("--c_mod_bar_height");
+
+        /*颜色rgb信息*/
+        let scale_color = {
+            'C': "#FFC7CE",
+            'Db': "#f56262",
+            'D': "#37bdfc",
+            'Eb': "#be8f3c",
+            'E': "#DDEBF7",
+            'F': "#99FF33",
+            'F#': "#dc3e8c",
+            'G': "#2cc485",
+            'Ab': "#A6A6A6",
+            'A': "#b77556",
+            'Bb': "#88FFFF",
+            'B': "#e07e9d",
+        }
+
+        /*菜单功能*/
+        /*隐藏菜单*/
+        function hide_menu(){
+            let menu = document.getElementsByClassName("detail-menu")[0];
+            menu.style.display = "none";
+        }
+        /*显示菜单*/
+        function show_menu(){
+            let detail_menu = document.getElementsByClassName("detail-menu")[0];
+            let menu = document.getElementsByClassName("menu")[0];
+            if (menu.innerHTML === '▲') {
+                detail_menu.style.display = "none";
+                menu.innerHTML = '▼';
+            }
+            else {
+                detail_menu.style.display = "flex";
+                menu.innerHTML = '▲';
+            }
+        }
+
+        /*关闭、打开注释*/
+        function close_rmk(){
+            if (window.chord_prog_page_arr !== undefined){
+                let close_rmk_btn = document.getElementById("close-rmk-btn");
+                console.log(close_rmk_btn.innerHTML);
+                if (close_rmk_btn.innerHTML === '关闭注释') {
+                    close_rmk_btn.innerHTML = "显示注释";
+                    window.show_rmk = false;
+                    window.chord_prog_page_arr = window.chord_prog_page_arr_without_rmk;
+                    load_page();
+                    if (window.cur_scrollTop !== undefined){
+                        document.documentElement.scrollTop = window.cur_scrollTop;
+                    }
+                }
+                else {
+                    close_rmk_btn.innerHTML = "关闭注释";
+                    window.show_rmk = true;
+                    window.chord_prog_page_arr = window.chord_prog_page_arr_with_rmk;
+                    load_page();
+                    if (window.cur_scrollTop !== undefined){
+                        document.documentElement.scrollTop = window.cur_scrollTop;
+                    }
+                }
+            }
+        }
+
+        /*去除注释*/
+        function get_display_data_without_rmk(display_data){
+            let display_data_copy = JSON.parse(JSON.stringify(display_data))
+            for (let i = 0; i < display_data_copy.length; i++) {
+                for (let j = 0; j < display_data_copy[i].length; j++) {
+                    for (let k = 0; k < display_data_copy[i][j]['lines'].length; k++) {
+                        for (let l = 0; l < display_data_copy[i][j]['lines'][k]['remarks'].length; l++) {
+                            display_data_copy[i][j]['lines'][k]['remarks'][l] = 0;
+                        }
+                    }
+                }
+            }
+            return display_data_copy;
+        }
+
+        /*调整音频速度*/
+        function change_audio_speed(){
+            if (window.audio !== undefined) {
+                let rate_select = document.getElementById("play-back-rate-select");
+                window.audio.playbackRate = rate_select.value;
+            }
+        }
+
+
+        function stop(){
+            window.audio.pause();
+            window.audio.currentTime = 0;
+
+            let play_icon = document.getElementsByClassName("play-icon")[0];
+            play_icon.innerHTML = '▶️';
+            window.is_playing = false;
+            window.cur_chord_bar_id = 0;
+        }
+        function play(){
+            let play_icon = document.getElementsByClassName("play-icon")[0];
+            if (window.is_playing) {
+                play_icon.innerHTML = '▶️';
+                window.is_playing = false;
+                window.audio.pause();
+            }
+            else {
+                play_icon.innerHTML = '⏸';
+                window.is_playing = true;
+                window.audio.play();
+            }
+        }
+        // window.audio.addEventListener("timeupdate", function (e){
+        //     // console.log(e.path[0].currentTime);
+        //     function high_light_cur_bar(chord_bar_id, if_highlight) {
+        //         let bar_info = window.play_map[chord_bar_id];
+        //         let page = bar_info['page'];
+        //         let col_num = bar_info['col_num'];
+        //         let index = bar_info['index'];
+        //         if (page !== window.cur_page) {
+        //             window.cur_page = page;
+        //             load_page();
+        //         }
+        //         let cur_line = document.getElementsByClassName("div-chord-prog-line")[col_num];
+        //         let cur_bar = cur_line.children[index+2].children[0];
+        //         if (if_highlight) {
+        //             cur_bar.style.backgroundColor = 'yellow';
+        //         }
+        //         else {
+        //             cur_bar.style.backgroundColor = cur_bar.bg_color;
+        //         }
+        //     }
+        //
+        //     if (e.path[0].currentTime >= window.play_map[window.cur_chord_bar_id]['end']-0.2) {
+        //         if (window.cur_chord_bar_id < play_map.length -1) {
+        //             window.cur_chord_bar_id += 1;
+        //         }
+        //     }
+        //
+        //     if (window.cur_highlight_bar_id !== window.cur_chord_bar_id) {
+        //         /*除了刚开始播放的情况，没有高亮的格子，所以不用取消*/
+        //         if (window.cur_highlight_bar_id !== -1){
+        //             high_light_cur_bar(window.cur_highlight_bar_id, false);
+        //         }
+        //         // high_light_cur_bar(window.cur_highlight_bar_id, false);
+        //         high_light_cur_bar(window.cur_chord_bar_id, true);
+        //         window.cur_highlight_bar_id = window.cur_chord_bar_id;
+        //     }
+        // }, false);
+        //
+        // window.audio.addEventListener('ended', function () {
+        //     let play_icon = document.getElementsByClassName("play-icon")[0];
+        //     play_icon.innerHTML = '▶️';
+        //     window.is_playing = false;
+        //     window.audio.pause();
+        // }, false);
+
+
+        /*读取json文件，并加载*/
+        const reader = new FileReader();
+        const fileUploader = document.getElementById('file-uploader');
+        fileUploader.addEventListener('change', (event) => {
+            const files = event.target.files;
+            reader.readAsText(files[0]);
+        });
+        reader.addEventListener('load', (event) => {
+            if (window.audio !== undefined){
+                stop();
+            }
+            /*初始化一些变量*/
+            /*鼠标当前所在div的颜色*/
+            window.cur_div_color = undefined;
+            /*当前播放所在和弦块的位置*/
+            window.cur_chord_bar_id = 0;   /*由音乐时间决定*/
+            /*当前高亮所在和弦块的位置*/
+            window.cur_highlight_bar_id = -1;
+            /*在音乐播放时，记录滚动条当前位置*/
+            window.cur_scrollTop = undefined;
+
+            let base = new Base64();
+            let result = base.decode(reader.result);
+            window.cur_page = 0;
+            let display = JSON.parse(result);
+            window.display = display;
+            /*有注释的版本*/
+            window.chord_prog_page_arr_with_rmk = window.display["chord_prog_page_arr"];
+            /*无注释的版本*/
+            window.chord_prog_page_arr_without_rmk = get_display_data_without_rmk(window.display["chord_prog_page_arr"]);
+            if (window.show_rmk){
+                window.chord_prog_page_arr = window.chord_prog_page_arr_with_rmk;
+            }
+            else{
+                window.chord_prog_page_arr = window.chord_prog_page_arr_without_rmk;
+            }
+            window.play_map = display["play_map"];
+            window.cur_song_fp = display['song_fp']
+            window.max_page = chord_prog_page_arr.length;
+            /*读取mp3*/
+            console.log("loading mp3 file: ", window.cur_song_fp)
+            window.audio = new Audio(window.cur_song_fp);
+            window.audio.addEventListener("timeupdate", function (e){
+                // console.log(e.path[0].currentTime);
+                function high_light_cur_bar(chord_bar_id, if_highlight) {
+                    let bar_info = window.play_map[chord_bar_id];
+                    let page = bar_info['page'];
+                    let col_num = bar_info['col_num'];
+                    let index = bar_info['index'];
+                    if (page !== window.cur_page) {
+                        window.cur_page = page;
+                        load_page();
+                    }
+                    let cur_line = document.getElementsByClassName("div-chord-prog-line")[col_num];
+                    let cur_bar = cur_line.children[index+2].children[0];
+                    if (if_highlight) {
+                        cur_bar.style.backgroundColor = 'yellow';
+                    }
+                    else {
+                        cur_bar.style.backgroundColor = cur_bar.bg_color;
+                    }
+                }
+
+                /*读取延迟*/
+                let delay = document.getElementById("delay-range-input");
+
+                if (e.path[0].currentTime >= window.play_map[window.cur_chord_bar_id]['end']-0.15+delay.value/100) {
+                    if (window.cur_chord_bar_id < play_map.length -1) {
+                        window.cur_chord_bar_id += 1;
+                    }
+                }
+
+                if (window.cur_highlight_bar_id !== window.cur_chord_bar_id) {
+                    /*除了刚开始播放的情况，没有高亮的格子，所以不用取消*/
+                    if (window.cur_highlight_bar_id !== -1){
+                        high_light_cur_bar(window.cur_highlight_bar_id, false);
+                    }
+                    // high_light_cur_bar(window.cur_highlight_bar_id, false);
+                    high_light_cur_bar(window.cur_chord_bar_id, true);
+                    window.cur_highlight_bar_id = window.cur_chord_bar_id;
+                }
+
+                /*获取当前滚动条位置*/
+                window.cur_scrollTop = document.documentElement.scrollTop;
+
+            }, false);
+            window.audio.addEventListener('ended', function () {
+                let play_icon = document.getElementsByClassName("play-icon")[0];
+                play_icon.innerHTML = '▶️';
+                window.is_playing = false;
+                window.audio.pause();
+            }, false);
+            load_page();
+        });
+
+
+        function load_page(){
+
+            let chord_prog_block_arr = window.chord_prog_page_arr[window.cur_page];
+            let div_main_area = document.getElementsByClassName("main-area")[0];
+
+            // console.log(div_main_area.children.length);
+            /*清除表头外的所有内容*/
+            for (let i = div_main_area.children.length-1; i > 0 ; i--) {
+                div_main_area.children[i].remove();
+            }
+            // console.log(div_main_area.children.length);
+
+            /*每次循环画一个block，比如前奏1-1的两行就是一个block*/
+            for (let i = 0; i < chord_prog_block_arr.length; i++) {
+                let chord_prog_block = chord_prog_block_arr[i]
+                let block_name = chord_prog_block['block_name'];
+                let lines = chord_prog_block['lines'];
+
+                /*每次循环画一行*/
+                for (let j = 0; j < lines.length; j++) {
+                    let chord_info = lines[j];
+                    let div_chord_prog_line = document.createElement("div");
+                    div_main_area.appendChild(div_chord_prog_line);
+                    div_chord_prog_line.className = "div-chord-prog-line";
+
+                    /*左边栏*/
+                    let div_block_name = document.createElement("div");
+                    div_chord_prog_line.appendChild(div_block_name);
+                    div_block_name.className = "block-name";
+                    let div_block_name_top = document.createElement("div");
+                    let div_block_name_mid = document.createElement("div");
+                    let div_block_name_btm = document.createElement("div");
+                    div_block_name.appendChild(div_block_name_top);
+                    div_block_name.appendChild(div_block_name_mid);
+                    div_block_name.appendChild(div_block_name_btm);
+                    div_block_name_top.className = "block-name-top";
+                    div_block_name_mid.className = "block-name-mid";
+                    div_block_name_btm.className = "block-name-btm";
+                    if (j === 0){
+                        let span = document.createElement("span");
+                        div_block_name_top.appendChild(span);
+                        span.innerHTML = block_name;
+                        adj_span_font_size(span, window.getComputedStyle(div_block_name_top).width, "10px");
+                        div_block_name_top.style.borderTop = "1px rgb(40,40,40) solid";
+                    }
+                    if (j === lines.length-1) {
+                        div_block_name_btm.style.borderBottom = "1px rgb(40,40,40) solid";
+                    }
+
+                    /*调*/
+                    let div_scale_name = document.createElement("div");
+                    div_chord_prog_line.appendChild(div_scale_name);
+                    div_scale_name.className = "scale-name";
+                    let div_scale_name_top = document.createElement("div");
+                    let div_scale_name_mid = document.createElement("div");
+                    let div_scale_name_btm = document.createElement("div");
+                    div_scale_name.appendChild(div_scale_name_top);
+                    div_scale_name.appendChild(div_scale_name_mid);
+                    div_scale_name.appendChild(div_scale_name_btm);
+                    div_scale_name_top.className = "scale-name-top";
+                    div_scale_name_mid.className = "scale-name-mid";
+                    div_scale_name_btm.className = "scale-name-btm";
+                    div_scale_name_top.innerHTML = chord_info["scale"];
+                    if (j === 0){
+                        div_scale_name_top.style.borderTop = "1px rgb(40,40,40) solid";
+                    }
+                    if (j === lines.length-1) {
+                        div_scale_name_btm.style.borderBottom = "1px rgb(40,40,40) solid";
+                    }
+
+                    /*画和弦块*/
+                    let beats_count = 0;  //记录和弦块总长度，不足部分使用黑色填充
+                    for (let k = 0; k < chord_info["chord_bars"].length; k++) {
+                        beats_count += chord_info["chord_bars"][k][0];
+                        let div_chord_name = document.createElement("div");
+                        div_chord_prog_line.appendChild(div_chord_name);
+                        div_chord_name.className = "chord-name";
+                        let div_chord_name_top = document.createElement("div");
+                        let div_chord_name_mid = document.createElement("div");
+                        let div_chord_name_btm = document.createElement("div");
+                        div_chord_name.appendChild(div_chord_name_top);
+                        div_chord_name.appendChild(div_chord_name_mid);
+                        div_chord_name.appendChild(div_chord_name_btm);
+                        div_chord_name_top.className = "chord-name-top";
+                        div_chord_name_mid.className = "roman-num-name-mid";
+                        div_chord_name_btm.className = "c-mod-name-btm";
+                        let width = String(chord_info["chord_bars"][k][0] * parseInt(pub_basic_width) - 2 - 3) + 'px';
+                        div_chord_name_top.style.width = width;
+                        div_chord_name_mid.style.width = width;
+                        div_chord_name_btm.style.width = width;
+                        // div_chord_name_top.style.backgroundColor = scale_color[chord_info['scale']];
+
+
+                        /*设置鼠标悬浮状态*/
+                        div_chord_name_top.onmouseover = function (){
+                            if (this.time_end !== undefined){
+                                this.style.cursor = "pointer";
+                                // window.cur_div_color = this.style.backgroundColor
+                                this.style.backgroundColor = 'yellow';
+                            }
+                        }
+                        div_chord_name_top.onmouseout = function (){
+                            if (this.time_end !== undefined){
+                                this.style.cursor = "auto";
+                                // this.style.backgroundColor = window.cur_div_color;
+                                this.style.backgroundColor = this.bg_color;
+                            }
+                        }
+
+                        /*设置双击触发事件*/
+                        div_chord_name_top.ondblclick = function (){
+                            if (this.time_end !== undefined) {
+                                // console.log(this.play_map_index);
+                                window.cur_chord_bar_id = this.play_map_index;
+                                let play_icon = document.getElementsByClassName("play-icon")[0];
+                                play_icon.innerHTML = '⏸';
+                                window.is_playing = true;
+                                window.audio.currentTime = this.time_start - 0.5;
+                                window.audio.play();
+                            }
+
+                        }
+
+
+                        let span_top = document.createElement("span");
+                        let span_mid = document.createElement("span");
+                        let span_btm = document.createElement("span");
+
+                        div_chord_name_top.appendChild(span_top);
+                        div_chord_name_mid.appendChild(span_mid);
+                        div_chord_name_btm.appendChild(span_btm);
+                        span_top.innerHTML = chord_info["chord_bars"][k][1];
+                        span_mid.innerHTML = chord_info["chord_bars"][k][2];
+                        span_btm.innerHTML = chord_info["chord_bars"][k][3];
+
+                        div_chord_name_top.style.backgroundColor = scale_color[chord_info["chord_bars"][k][4]];
+
+                        adj_span_font_size(span_top, get_width(div_chord_name_top), "10px");
+                        adj_span_font_size(span_mid, get_width(div_chord_name_mid), "10px");
+                        adj_span_font_size(span_btm, get_width(div_chord_name_btm), "10px");
+
+
+                        if (chord_info["chord_bars"][k][1] === '>>' || chord_info["chord_bars"][k][1] === '<<') {
+                            div_chord_name_top.style.fontFamily = "Microsoft YaHei";
+                        }
+                        /*绑定位置信息*/
+                        div_chord_name_top.page = window.cur_page;
+                        div_chord_name_top.col_num = chord_info["col_num"];
+                        div_chord_name_top.time_start = chord_info['time_start'][k];
+                        div_chord_name_top.time_end = chord_info['time_end'][k];
+                        div_chord_name_top.play_map_index = chord_info['play_map_index'][k];
+                        div_chord_name_top.bg_color = scale_color[chord_info["chord_bars"][k][4]];
+
+                        /*修改解说区域的外边框*/
+                        /*情况1：解说区域开始*/
+                        //解说框宽度
+                        let w = 3
+                        let rmk_border_style = "px red solid"
+                        if (chord_info['remarks'][k] !== 1 && chord_info['remarks'][k] !== 0) {
+                            /*如果只有一块解说*/
+
+                            if (k === chord_info["chord_bars"].length-1 || chord_info['remarks'][k+1] !== 1) {
+                                div_chord_name_top.style.height = String(parseInt(window.getComputedStyle(div_chord_name_top).height) - w) + "px";
+                                div_chord_name_top.style.width = String(parseInt(window.getComputedStyle(div_chord_name_top).width) - w - w) + "px";
+                                div_chord_name_top.style.borderTop = String(w+1)+rmk_border_style;
+                                div_chord_name_top.style.borderLeft = String(w+1)+rmk_border_style;
+                                div_chord_name_top.style.borderRight = String(w+1)+rmk_border_style;
+                                div_chord_name_mid.style.width = String(parseInt(window.getComputedStyle(div_chord_name_mid).width) - w - w) + "px";
+                                div_chord_name_mid.style.borderLeft = String(w+1)+rmk_border_style;
+                                div_chord_name_mid.style.borderRight = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.height = String(parseInt(window.getComputedStyle(div_chord_name_btm).height) - w) + "px";
+                                div_chord_name_btm.style.width = String(parseInt(window.getComputedStyle(div_chord_name_btm).width) - w - w) + "px";
+                                div_chord_name_btm.style.borderBottom = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.borderLeft = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.borderRight = String(w+1)+rmk_border_style;
+                            }/*后面还有解说*/
+                            else{
+                                div_chord_name_top.style.height = String(parseInt(window.getComputedStyle(div_chord_name_top).height) - w) + "px";
+                                div_chord_name_top.style.width = String(parseInt(window.getComputedStyle(div_chord_name_top).width) - w) + "px";
+                                div_chord_name_top.style.borderTop = String(w+1)+rmk_border_style;
+                                div_chord_name_top.style.borderLeft = String(w+1)+rmk_border_style;
+                                div_chord_name_mid.style.width = String(parseInt(window.getComputedStyle(div_chord_name_mid).width) - w) + "px";
+                                div_chord_name_mid.style.borderLeft = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.height = String(parseInt(window.getComputedStyle(div_chord_name_btm).height) - w) + "px";
+                                div_chord_name_btm.style.width = String(parseInt(window.getComputedStyle(div_chord_name_btm).width) - w) + "px";
+                                div_chord_name_btm.style.borderBottom = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.borderLeft = String(w+1)+rmk_border_style;
+                            }
+                        }/*情况2：解说区域中间*/
+                        else if (chord_info['remarks'][k] === 1) {
+                            /*如果后面没1了*/
+                            if (k === chord_info["chord_bars"].length-1 || chord_info['remarks'][k+1] !== 1) {
+                                div_chord_name_top.style.height = String(parseInt(window.getComputedStyle(div_chord_name_top).height) - w) + "px";
+                                div_chord_name_top.style.width = String(parseInt(window.getComputedStyle(div_chord_name_top).width) - w) + "px";
+                                div_chord_name_top.style.borderTop = String(w+1)+rmk_border_style;
+                                div_chord_name_top.style.borderRight = String(w+1)+rmk_border_style;
+                                div_chord_name_mid.style.width = String(parseInt(window.getComputedStyle(div_chord_name_mid).width) - w) + "px";
+                                div_chord_name_mid.style.borderRight = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.height = String(parseInt(window.getComputedStyle(div_chord_name_btm).height) - w) + "px";
+                                div_chord_name_btm.style.width = String(parseInt(window.getComputedStyle(div_chord_name_btm).width) - w) + "px";
+                                div_chord_name_btm.style.borderBottom = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.borderRight = String(w+1)+rmk_border_style;
+                            }
+                            else{
+                                div_chord_name_top.style.height = String(parseInt(window.getComputedStyle(div_chord_name_top).height) - w) + "px";
+                                div_chord_name_top.style.borderTop = String(w+1)+rmk_border_style;
+                                div_chord_name_btm.style.height = String(parseInt(window.getComputedStyle(div_chord_name_btm).height) - w) + "px";
+                                div_chord_name_btm.style.borderBottom = String(w+1)+rmk_border_style;
+                            }
+                        }
+
+                    }
+                    /*若长度不足，则使用黑色块填充*/
+                    if (beats_count < 64) {
+                        let div_chord_name = document.createElement("div");
+                        div_chord_prog_line.appendChild(div_chord_name);
+                        div_chord_name.className = "chord-name";
+                        let div_chord_name_top = document.createElement("div");
+                        let div_chord_name_mid = document.createElement("div");
+                        let div_chord_name_btm = document.createElement("div");
+                        div_chord_name.appendChild(div_chord_name_top);
+                        div_chord_name.appendChild(div_chord_name_mid);
+                        div_chord_name.appendChild(div_chord_name_btm);
+                        div_chord_name_top.className = "chord-name-top";
+                        div_chord_name_mid.className = "roman-num-name-mid";
+                        div_chord_name_btm.className = "c-mod-name-btm";
+                        let width = String((64-beats_count) * parseInt(pub_basic_width) - 2 -3) + 'px';
+                        div_chord_name_top.style.width = width;
+                        div_chord_name_mid.style.width = width;
+                        div_chord_name_btm.style.width = width;
+                        div_chord_name_top.style.backgroundColor = 'black';
+                        div_chord_name_mid.style.backgroundColor = 'black';
+                        div_chord_name_btm.style.backgroundColor = 'black';
+                        div_chord_name_top.style.borderBottom = "1px black solid";
+                        div_chord_name_top.style.borderRight = "1px black solid";
+                        div_chord_name_mid.style.borderTop = "1px black solid";
+                        div_chord_name_mid.style.borderBottom = "1px black solid";
+                        div_chord_name_mid.style.borderRight = "1px black solid";
+                        div_chord_name_btm.style.borderTop = "1px black solid";
+                        div_chord_name_btm.style.borderRight = "1px black solid";
+                    }
+
+                    /*右侧解说栏*/
+                    let div_right_bar_remark = document.createElement("div");
+                    div_chord_prog_line.appendChild(div_right_bar_remark);
+
+                    div_right_bar_remark.className = "right-bar-remark";
+                    let final_text = "";
+                    /*辅助判断是不是这行只有一条注释*/
+                    let is_not_first_rmk = false
+                    for (let k = 0; k < chord_info['remarks'].length; k++) {
+                        if (chord_info['remarks'][k] !== 0 && chord_info['remarks'][k] !== 1
+                            && chord_info['remarks'][k] !== "") {
+                            if (is_not_first_rmk) {
+                                final_text += '； \n';
+                            }
+                            final_text += chord_info['remarks'][k]
+                            is_not_first_rmk = true
+                        }
+                    }
+                    div_right_bar_remark.innerHTML = final_text;
+                }
+            }
+        }
+
+        function load_next_page(){
+            if (window.cur_page < window.max_page-1) {
+                window.cur_page++;
+                load_page()
+            }
+        }
+
+        function load_prev_page(){
+            if (window.cur_page > 0) {
+                window.cur_page--;
+                load_page()
+            }
+        }
+
+        /*获取css中:root声明的变量*/
+        function get_css_root_val(val_str_name){
+            const allStyle = getComputedStyle(document.documentElement);
+            return String(allStyle.getPropertyValue(val_str_name)).trim();
+        }
+
+        /*计算元素的真实宽度，一般用于宽度不确定的span*/
+        function get_width(element){
+            let rect = element.getBoundingClientRect();
+            return rect.right - rect.left;
+        }
+
+        /*计算元素的真实高度*/
+        function get_height(element){
+            let rect = element.getBoundingClientRect();
+            return rect.top - rect.bottom;
+        }
+
+        /*改变元素背景颜色的alpha*/
+        function changeAlpha(element, aph_delta) {
+            let colors = getComputedStyle(element).getPropertyValue('background-color');
+            colors = colors.split(', ');
+            colors[0] = parseFloat(colors[0].split('(')[1]);
+            colors[1] = parseFloat(colors[1]);
+            colors[2] = parseFloat(colors[2]);
+            //Correct missing alpha
+            if (colors.length === 3) {
+                colors[3] = 1;
+            }
+            //Apply new style
+            colors[3] = parseFloat(colors[3]) + aph_delta;
+            colors = 'rgba(' + colors.join(',') + ')';
+            element.style.backgroundColor = colors;
+        }
+
+        /*调整span中内容的字体，使得span的宽度不超过指定宽度，切记在span中填入文本后调用*/
+        function adj_span_font_size(span_element, max_width, min_font_size){
+            span_element.style.fontSize = window.getComputedStyle(span_element).fontSize;
+
+            while ((parseInt(get_width(span_element)) > 0.75 * parseInt(max_width)) &&
+            (parseInt(span_element.style.fontSize) > parseInt(min_font_size))) {
+                // console.log(window.getComputedStyle(span_element).fontSize);
+                // console.log(get_width(span_element));
+                span_element.style.fontSize = String(parseInt(span_element.style.fontSize) - 2) + "px";
+            }
+            if (parseInt(get_width(span_element)) > parseInt(max_width)) {
+                span_element.style.letterSpacing = "-1px";
+            }
+        }
+
+
+        function Base64() {
+
+            // private property
+            _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+            // public method for encoding
+            this.encode = function (input) {
+                var output = "";
+                var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = _utf8_encode(input);
+                while (i < input.length) {
+                    chr1 = input.charCodeAt(i++);
+                    chr2 = input.charCodeAt(i++);
+                    chr3 = input.charCodeAt(i++);
+                    enc1 = chr1 >> 2;
+                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                    enc4 = chr3 & 63;
+                    if (isNaN(chr2)) {
+                        enc3 = enc4 = 64;
+                    } else if (isNaN(chr3)) {
+                        enc4 = 64;
+                    }
+                    output = output +
+                        _keyStr.charAt(enc1) + _keyStr.charAt(enc2) +
+                        _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+                }
+                return output;
+            }
+
+            // public method for decoding
+            this.decode = function (input) {
+                var output = "";
+                var chr1, chr2, chr3;
+                var enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                while (i < input.length) {
+                    enc1 = _keyStr.indexOf(input.charAt(i++));
+                    enc2 = _keyStr.indexOf(input.charAt(i++));
+                    enc3 = _keyStr.indexOf(input.charAt(i++));
+                    enc4 = _keyStr.indexOf(input.charAt(i++));
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                    output = output + String.fromCharCode(chr1);
+                    if (enc3 != 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 != 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                }
+                output = _utf8_decode(output);
+                return output;
+            }
+
+            // private method for UTF-8 encoding
+            _utf8_encode = function (string) {
+                string = string.replace(/\r\n/g,"\n");
+                var utftext = "";
+                for (var n = 0; n < string.length; n++) {
+                    var c = string.charCodeAt(n);
+                    if (c < 128) {
+                        utftext += String.fromCharCode(c);
+                    } else if((c > 127) && (c < 2048)) {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    } else {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+
+                }
+                return utftext;
+            }
+
+            // private method for UTF-8 decoding
+            _utf8_decode = function (utftext) {
+                var string = "";
+                var i = 0;
+                var c = c1 = c2 = 0;
+                while ( i < utftext.length ) {
+                    c = utftext.charCodeAt(i);
+                    if (c < 128) {
+                        string += String.fromCharCode(c);
+                        i++;
+                    } else if((c > 191) && (c < 224)) {
+                        c2 = utftext.charCodeAt(i+1);
+                        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                        i += 2;
+                    } else {
+                        c2 = utftext.charCodeAt(i+1);
+                        c3 = utftext.charCodeAt(i+2);
+                        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                        i += 3;
+                    }
+                }
+                return string;
+            }
+        }
+        // 监听键盘按下事件
+        // window.onkeydown = function () {
+        //     console.log(event.keyCode);
+        // }
+        document.onkeydown = function() {
+            if(event.keyCode === 32) {
+                event.preventDefault();
+                if (window.chord_prog_page_arr !== undefined){
+                    play();
+                }
+            }
+            else if(event.ctrlKey == true && event.keyCode == 79) {
+                event.preventDefault();//取消默认行为
+                let open_btn = document.getElementById('file-uploader');
+                open_btn.click();
+            }
+        }
+
+    </script>
+
+
+</body>
+</html>

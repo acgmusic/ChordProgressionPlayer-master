@@ -2,27 +2,33 @@
 a player for chord progression of a song
 
 ### 主要文件结构：
-
+```
 |---- song
+
     |---- 作曲家1
+
         |---- 歌手名 - 歌名.mp3
         .                                  
         .                                 
         .                                
-    |---- 作曲家2                          
-        |---- 歌手名 - 歌名.mp3            
+    |---- 作曲家2     
+
+        |---- 歌手名 - 歌名.mp3   
     .                                     
     .                                    
     .                                      
-|---- chord_progression                   
-    |---- 作曲家1                          
+|---- chord_progression      
+
+    |---- 作曲家1            
+
         |---- 歌手名 - 歌名.chord
         .
         .
         .
     |---- 作曲家2
-        |---- 歌手名 - 歌名.chord
 
+        |---- 歌手名 - 歌名.chord
+```
 
 * 如果要正常播放，请务必保证`song`和`chord_progression`两个文件夹下的`作曲家`文件夹下面，分别存在对应的`歌手名 - 歌名.mp3`和`歌手名 - 歌名.chord`。
   
@@ -32,7 +38,7 @@ a player for chord progression of a song
 
 ### FAQ:
 1. F: 网易云下载的文件是ncm格式的怎么办？
-   Q: 百度搜索在线转换ncm文件。当然也可以使用我写的一个[脚本文件](!https://github.com/acgmusic/fuck_ncm)，可以批量转换同一个目录下的所有ncm文件
+   Q: 百度搜索在线转换ncm文件。当然也可以使用我写的一个[脚本文件](https://github.com/acgmusic/fuck_ncm)，可以批量转换同一个目录下的所有ncm文件
 
 1. F: 为什么播放器没有声音?
    Q: 请使用Chrome或者Edge浏览器，其他浏览器存在兼容性问题。
